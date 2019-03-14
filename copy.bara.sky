@@ -1,0 +1,50 @@
+internalUrl = "git@github.com:samuelba/internal_test_repo.git"
+externalUrl = "git@github.com:samuelba/external_test_repo.git"
+
+core.workflow(
+    name = "default",
+    origin = git.origin(
+        url = internalUrl,
+        ref = "master",
+    ),
+    destination = git.destination(
+        url = externalUrl,
+        fetch = "master",
+        push = "master",
+    ),
+    origin_files = glob(["test_001/share_001/**", "test_001/share_002/**", "test_002/**"], exclude = ["**/key.txt"]),
+
+    destination_files = glob(["**"], exclude = ["bla.txt"]),
+
+    mode = "ITERATIVE",
+    authoring = authoring.pass_thru("Samuel Bachmann <samuel.bachmann@gmail.com>"),
+    transformations = [
+        #move to root of OSS repo
+        #core.move("koboshi-modules/hoopoe-koboshi-modules", ""),
+        #metadata.scrubber(jiraCommitHookRegex, replacement=''),
+        #metadata.restore_author(),
+    ],
+)
+core.workflow(
+    name = "import_pr",
+    origin = git.origin(
+        url = externalUrl,
+        ref = "master",
+    ),
+    destination = git.destination(
+        url = internalUrl,
+        fetch = "master",
+        push = "master",
+    ),
+    origin_files = glob(["**"], exclude = ["bla.txt"]),
+
+    destination_files = glob(["test_001/share_001/**", "test_001/share_002/**", "test_002/**"], exclude = ["**/key.txt"]),
+
+    mode = "CHANGE_REQUEST",
+    authoring = authoring.pass_thru("Samuel Bachmann <samuel.bachmann@gmail.com>"),
+    transformations = [
+        #move from root of OSS repo
+        #core.move("", "koboshi-modules/hoopoe-koboshi-modules"),
+        #metadata.save_author(),
+    ],
+)
