@@ -22,19 +22,18 @@ core.workflow(
         #move to root of OSS repo
         #core.move("koboshi-modules/hoopoe-koboshi-modules", ""),
         #metadata.scrubber(jiraCommitHookRegex, replacement=''),
-        #metadata.restore_author(),
+        metadata.restore_author(),
     ],
 )
 core.workflow(
     name = "import_pr",
-    origin = git.origin(
+    origin = git.github_pr_origin(
         url = externalUrl,
-        ref = "master",
     ),
     destination = git.destination(
         url = internalUrl,
         fetch = "master",
-        push = "master",
+        push = "external_pr/001",
     ),
     origin_files = glob(["**"], exclude = ["bla.txt"]),
 
@@ -45,6 +44,9 @@ core.workflow(
     transformations = [
         #move from root of OSS repo
         #core.move("", "koboshi-modules/hoopoe-koboshi-modules"),
-        #metadata.save_author(),
+        metadata.expose_label("COPYBARA_INTEGRATE_REVIEW"),
+        metadata.expose_label("GITHUB_PR_NUMBER", new_name ="Closes", separator=" #"),
+        metadata.replace_message("BEGIN_PUBLIC\n${COPYBARA_CURRENT_MESSAGE}\nEND_PUBLIC"),
+        metadata.save_author(),
     ],
 )
