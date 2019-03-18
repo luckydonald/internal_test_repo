@@ -30,10 +30,9 @@ core.workflow(
     origin = git.github_pr_origin(
         url = externalUrl,
     ),
-    destination = git.destination(
+    destination = git.github_pr_destination(
         url = internalUrl,
-        fetch = "master",
-        push = "external_pr/001",
+        destination_ref = "master",
     ),
     origin_files = glob(["**"], exclude = ["bla.txt"]),
 
